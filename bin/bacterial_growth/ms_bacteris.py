@@ -143,7 +143,7 @@ gompertz_model=ms.from_string_model(x,y,gompertz_growth,1,4,XLABS,silence=False)
 print(logistic_model.par_values)
 print(gompertz_model.par_values)
 """
-
+print('BMS B(t)')
 with open(f'./{folder_name}/stdout.txt', 'a') as f:
     with redirect_stdout(f):
         best_model, mdl, fig_dl = ms.machinescientist(x,
@@ -169,9 +169,9 @@ SMALL_SIZE = 26
 MEDIUM_SIZE = 26
 BIGGER_SIZE = 26
 #sbrn.set(style='ticks', font_scale=2)
-fig = plt.figure()
-fig1=plt.figure()
-fig2=plt.figure()
+fig = plt.figure(figsize=(30,30))
+fig1=plt.figure(figsize=(30,30))
+fig2=plt.figure(figsize=(30,30))
 g = gs.GridSpec(n_rows,n_cols, wspace=0.1, hspace=0.1)
 #g.update(wspace=2.0, hspace=0.3)
 
@@ -209,22 +209,26 @@ for i in range(0,n_rows):
 		# Data
 		ax.plot(x[col].t.to_numpy(),y[col].to_numpy(),color='tab:blue',label='data')
 		# Logistic
-		# Scipy optimize
-		def logistic(x, a0,a1,a2,a3,a4,a5):
-		    #return a0/(1.+a1*np.exp(-a2*x))
-		    return a0 + ((a1 - a0) / (a2 + np.exp((a3 * (a4 - x)) + a5)))
-		
-		lpopt, lpcov = curve_fit(logistic, x[col].t.to_numpy() , y[col].to_numpy())
-		file1.write(f"Logistic {col} params: {lpopt}\n")
-		if 'in' in lpopt:
-			lpopt, lpcov = curve_fit(logistic, x[col].t.to_numpy() , y[col].to_numpy(),p0=[2.91709554e-01,1.48474918e+00,-7.60461841e+02])
-		#print(lpopt,lpcov)
+		try:
+			# Scipy optimize
+			def logistic(x, a0,a1,a2,a3,a4,a5):
+			    #return a0/(1.+a1*np.exp(-a2*x))
+			    return a0 + ((a1 - a0) / (a2 + np.exp((a3 * (a4 - x)) + a5)))
+			
+			lpopt, lpcov = curve_fit(logistic, x[col].t.to_numpy() , y[col].to_numpy())
+			file1.write(f"Logistic {col} params: {lpopt}\n")
+			if 'in' in lpopt:
+				lpopt, lpcov = curve_fit(logistic, x[col].t.to_numpy() , y[col].to_numpy(),p0=[2.91709554e-01,1.48474918e+00,-7.60461841e+02])
+			#print(lpopt,lpcov)
 
-		ax.plot(x[col].to_numpy(),logistic(x[col].t.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
-		ax1.plot(y[col].to_numpy(),logistic(x[col].t.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
+			ax.plot(x[col].to_numpy(),logistic(x[col].t.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
+			ax1.plot(y[col].to_numpy(),logistic(x[col].t.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
+		except:
+			pass
+		"""
 		# Gompertz
 		# Scipy optimize
-		"""
+		
 		def gompertz(x, a0,a1,a2):
 		    #return a0*np.exp(-a1*np.exp(-a2*x))
 		    #return a0*np.exp(a1*(1.-np.exp(-a2*x)))
@@ -305,7 +309,7 @@ mcmc_steps = 7000
 XLABS = ['B']
 params = 4
 
-print()
+print('BMS dB/dt')
 with open(f'./{folder_name}/stdout.txt', 'a') as f:
     with redirect_stdout(f):
         best_model, mdl, fig_dl = ms.machinescientist(x,
@@ -362,11 +366,11 @@ def resize(t1,t2,B):
 			res.append(j)
 	return res
 
-fig = plt.figure()
-fig1=plt.figure()
-fig2=plt.figure()
-fig3=plt.figure()
-fig4=plt.figure()
+fig = plt.figure(figsize=(30,30))
+fig1=plt.figure(figsize=(30,30))
+fig2=plt.figure(figsize=(30,30))
+fig3=plt.figure(figsize=(30,30))
+fig4=plt.figure(figsize=(30,30))
 g = gs.GridSpec(n_rows,n_cols, wspace=0.1, hspace=0.1)
 #g.update(wspace=2.0, hspace=0.3)
 
@@ -418,37 +422,43 @@ for i in range(0,n_rows):
 		# Data
 		ax.plot(x[col].B.to_numpy(),y[col].to_numpy(),color='tab:blue',label='data')
 		# Logistic
-		# Scipy optimize
-		def logistic(x, a0,a1,a2):
-		    return a0*x*(a1-x*a2)
-		
-		lpopt, lpcov = curve_fit(logistic, x[col].B.to_numpy() , y[col].to_numpy())
-		file1.write(f"Logistic-diff {col} params: {lpopt}\n")
-		#if 'in' in lpopt:
-		#	lpopt, lpcov = curve_fit(logistic, x[col].B.to_numpy() , y[col].to_numpy(),p0=[2.91709554e-01,1.48474918e+00,-7.60461841e+02])
-		#print(lpopt,lpcov)
+		try:
+			# Scipy optimize
+			def logistic(x, a0,a1,a2):
+			    return a0*x*(a1-x*a2)
+			
+			lpopt, lpcov = curve_fit(logistic, x[col].B.to_numpy() , y[col].to_numpy())
+			file1.write(f"Logistic-diff {col} params: {lpopt}\n")
+			#if 'in' in lpopt:
+			#	lpopt, lpcov = curve_fit(logistic, x[col].B.to_numpy() , y[col].to_numpy(),p0=[2.91709554e-01,1.48474918e+00,-7.60461841e+02])
+			#print(lpopt,lpcov)
 
-		ax.plot(x[col].B.to_numpy(),logistic(x[col].B.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
-		ax1.plot(y[col].to_numpy(),logistic(x[col].B.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
-		log_num=euler_curvefit(logistic,B[0],h,len(times),lpopt)
-		ax3.plot(times,log_num,color='tab:orange',label='Logistic')
-		ax4.plot(data[col].to_numpy(),resize(data['Time(min)'].to_numpy(),times,log_num),color='tab:orange',label='Logistic')
-		# Gompertz
-		# Scipy optimize
-		def gompertz(x, a0,a1):
-		    #return -a0*np.log(x/a1)*x
-		    return a0*np.log(a1/x)*x
-		
-		gpopt, gpcov = curve_fit(gompertz, x[col].B.to_numpy() , y[col].to_numpy())
-		file1.write(f"Gompertz-diff {col} params: {gpopt}\n")
-		#if 'in' in gpopt:
-		#	gpopt, gpcov = curve_fit(gompertz, x[col].B.to_numpy() , y[col].to_numpy(),p0=[0.1,2.67791891e-01,1.39481299e-04])
-		#print(gpopt,gpcov)
-		ax.plot(x[col].B.to_numpy(),gompertz(x[col].B.to_numpy(),*gpopt),color='tab:green',label='Gompertz')
-		ax1.plot(y[col].to_numpy(),gompertz(x[col].B.to_numpy(),*gpopt),color='tab:green',label='Gompertz')
-		gom_num=euler_curvefit(gompertz,B[0],h,len(times),gpopt)
-		ax3.plot(times,gom_num,color='tab:green',label='Gompertz')
-		ax4.plot(data[col].to_numpy(),resize(data['Time(min)'].to_numpy(),times,gom_num),color='tab:green',label='Gompertz')
+			ax.plot(x[col].B.to_numpy(),logistic(x[col].B.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
+			ax1.plot(y[col].to_numpy(),logistic(x[col].B.to_numpy(),*lpopt),color='tab:orange',label='Logistic')
+			log_num=euler_curvefit(logistic,B[0],h,len(times),lpopt)
+			ax3.plot(times,log_num,color='tab:orange',label='Logistic')
+			ax4.plot(data[col].to_numpy(),resize(data['Time(min)'].to_numpy(),times,log_num),color='tab:orange',label='Logistic')
+		except:
+			pass
+		try:
+			# Gompertz
+			# Scipy optimize
+			def gompertz(x, a0,a1):
+			    #return -a0*np.log(x/a1)*x
+			    return a0*np.log(a1/x)*x
+			
+			gpopt, gpcov = curve_fit(gompertz, x[col].B.to_numpy() , y[col].to_numpy())
+			file1.write(f"Gompertz-diff {col} params: {gpopt}\n")
+			#if 'in' in gpopt:
+			#	gpopt, gpcov = curve_fit(gompertz, x[col].B.to_numpy() , y[col].to_numpy(),p0=[0.1,2.67791891e-01,1.39481299e-04])
+			#print(gpopt,gpcov)
+			ax.plot(x[col].B.to_numpy(),gompertz(x[col].B.to_numpy(),*gpopt),color='tab:green',label='Gompertz')
+			ax1.plot(y[col].to_numpy(),gompertz(x[col].B.to_numpy(),*gpopt),color='tab:green',label='Gompertz')
+			gom_num=euler_curvefit(gompertz,B[0],h,len(times),gpopt)
+			ax3.plot(times,gom_num,color='tab:green',label='Gompertz')
+			ax4.plot(data[col].to_numpy(),resize(data['Time(min)'].to_numpy(),times,gom_num),color='tab:green',label='Gompertz')
+		except:
+			pass
 		# MS
 		ax.plot(x[col].B.to_numpy(),ms_predict[col].to_numpy(),color='tab:red',label='BMS')
 		ax1.plot(y[col].to_numpy(),ms_predict[col].to_numpy(),color='tab:red',label='BMS')
